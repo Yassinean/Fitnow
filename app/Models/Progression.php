@@ -13,6 +13,9 @@ class Progression extends Model
         'poids',
         'taille',
         'performances',
-        'status',
     ];
+
+    public function user(){
+        return $this->belongsTo(Progression::class);
+    }
 }
