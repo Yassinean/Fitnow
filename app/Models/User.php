@@ -47,6 +47,6 @@ class User extends Authenticatable
     }
 
     public function progression(){
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class);
     }
 }
