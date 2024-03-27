@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Progression extends Model
 {
     use HasFactory;
-
+    protected $primaryKey = 'id';
     protected $fillable = [
         'poids',
         'taille',
@@ -16,7 +16,8 @@ class Progression extends Model
         'user_id',
     ];
 
-    public function user(){
+    public function user()
+    {
         return $this->hasOne(Progression::class);
     }
 }

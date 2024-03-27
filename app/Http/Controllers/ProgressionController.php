@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Progression;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Validator;
 use App\Http\Resources\ProgressionResource;
 use App\Http\Controllers\API\BaseController as BaseController;
 
@@ -18,11 +16,12 @@ class ProgressionController extends BaseController
         // Your controller logic here
     }
 
-    public function index()
+    public function show()
     {
-        // $progressions = Progression::where('user_id', auth()->id());
+        $usr = Auth::id();
+        $progression = Progression::where('user_id', $usr)->get();
 
-        // return $this->sendResponse($progressions, 'Products retrieved successfully.');
+        return $this->sendResponse($progression, 'Products retrieved successfully.');
     }
 
     /**
