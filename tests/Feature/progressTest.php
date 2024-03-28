@@ -24,11 +24,12 @@ class progressTest extends TestCase
     {
         $user = User::factory()->create();
         $this->actingAs($user);
-        $response = $this->post('/api/progression', [
+        $response = $this->post('/api/progression/add', [
             'user_id' => $user->id,
             'poids' => 59.7,
             'taille' => 180,
             'performances' => 'good',
+            'status' => 'Non terminé',
         ]);
 
         $response->assertStatus(200);
@@ -44,7 +45,7 @@ class progressTest extends TestCase
             'performances' => 'good',
         ]);
 
-        $response = $this->patch('/api/progression/update/' . $progression->id, [
+        $response = $this->put('/api/progression/update/'.$progression->id, [
             'poids' => 60.0,
             'taille' => 182,
             'performances' => 'excellent',
@@ -53,7 +54,8 @@ class progressTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testProgressCanBeDeleted(){
+    public function testProgressCanBeDeleted()
+    {
         $user = User::factory()->create();
         $this->actingAs($user);
         $progression = Progression::create([

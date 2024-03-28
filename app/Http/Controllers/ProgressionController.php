@@ -47,6 +47,7 @@ class ProgressionController extends BaseController
             'poids' => $validateData['poids'],
             'taille' => $validateData['taille'],
             'performances' => $validateData['performances'],
+            'status' => 'Non Terminé',
         ]);
 
 
@@ -96,7 +97,6 @@ class ProgressionController extends BaseController
                 'poids' => 'required',
                 'taille' => 'required',
                 'performances' => 'required',
-                'status' => 'required',
             ]);
 
             $progression->update($validatedData);
@@ -110,6 +110,30 @@ class ProgressionController extends BaseController
         }
     }
 
+    public function updateStatus(Request $request, Progression $progression)
+    {
+        if (auth()->check() && $progression->user_id === auth()->id()) {
+            $validatedData = $request->validate([
+                'status' => 'required',
+            ]);
+
+            $success = $progression->update([
+                'status' => $validatedData['status'],
+            ]);
+
+            if ($success) {
+                $data = [
+                    'message' => 'status changed succefully!'
+                ];
+                return response()->json($data, 200);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -117,18 +141,17 @@ class ProgressionController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-   public function destroy(Progression $progression): JsonResponse
-{
-    if (auth()->check() && $progression->user_id === auth()->id()) {
-        $progression->delete();
+    public function destroy(Progression $progression): JsonResponse
+    {
+        if (auth()->check() && $progression->user_id === auth()->id()) {
+            $progression->delete();
 
-        return response()->json(['msg' => 'Progression deleted successfully']);
-    } else {
-        return response()->json([
-            "status" => 0,
-            "msg" => "Unauthorized: You are not allowed to delete this progression."
-        ], 401);
+            return response()->json(['msg' => 'Progression deleted successfully']);
+        } else {
+            return response()->json([
+                "status" => 0,
+                "msg" => "Unauthorized: You are not allowed to delete this progression."
+            ], 401);
+        }
     }
-}
-
 }
