@@ -54,7 +54,7 @@ class progressTest extends TestCase
     }
 
     public function testProgressCanBeDeleted(){
-          $user = User::factory()->create();
+        $user = User::factory()->create();
         $this->actingAs($user);
         $progression = Progression::create([
             'user_id' => $user->id,

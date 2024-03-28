@@ -54,6 +54,34 @@ class ProgressionController extends BaseController
         // return response()->json(['msg' => 'Progression created successfully', 'data' => new ProgressionResource($progression)]);
     }
 
+    public function edit(Request $request, Progression $Progress)
+    {
+        if (auth()->id()) {
+            $request->validate([
+                'status' => 'required|in:Terminé,Non terminé',
+            ]);
+            if ($request->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation error',
+                    'errors' => $request->errors()
+                ], 401);
+            }
+            $Progress->update($request->all());
+
+            return response()->json([
+                "status" => 1,
+                "data" => $Progress,
+                "msg" => "Progress updated successfully"
+            ], 200);
+        } else {
+            return response()->json([
+                "status" => 0,
+                "msg" => "not yours"
+            ], 200);
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -63,16 +91,23 @@ class ProgressionController extends BaseController
      */
     public function update(Request $request, Progression $progression)
     {
-        $validatedData = $request->validate([
-            'poids' => 'required',
-            'taille' => 'required',
-            'performances' => 'required'
-        ]);
+        if (auth()->check() && $progression->user_id === auth()->id()) {
+            $validatedData = $request->validate([
+                'poids' => 'required',
+                'taille' => 'required',
+                'performances' => 'required',
+                'status' => 'required',
+            ]);
 
-        $progression->update($validatedData);
+            $progression->update($validatedData);
 
-        return $this->sendResponse(new ProgressionResource($progression), 'Progression update successfully.');
-        // return response()->json(['msg' => 'Progression updated successfully', 'data' => new ProgressionResource($progression)]);
+            return $this->sendResponse(new ProgressionResource($progression), 'Progression updated successfully.');
+        } else {
+            return response()->json([
+                "status" => 0,
+                "msg" => "Unauthorized: You are not allowed to update this progression."
+            ], 401);
+        }
     }
 
 
@@ -82,11 +117,18 @@ class ProgressionController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Progression $progression): JsonResponse
-    {
+   public function destroy(Progression $progression): JsonResponse
+{
+    if (auth()->check() && $progression->user_id === auth()->id()) {
         $progression->delete();
 
-        // return $this->sendResponse([], 'Progression deleted successfully.');
         return response()->json(['msg' => 'Progression deleted successfully']);
+    } else {
+        return response()->json([
+            "status" => 0,
+            "msg" => "Unauthorized: You are not allowed to delete this progression."
+        ], 401);
     }
+}
+
 }
